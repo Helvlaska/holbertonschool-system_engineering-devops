@@ -1,0 +1,92 @@
+# 3. Mise à l’échelle (Scale up)
+
+## 📌 Description
+
+Cette infrastructure reprend la version sécurisée et monitorée (tâche 2) mais elle est améliorée pour gérer une charge plus importante et réduire encore les SPOF.
+
+Elle comprend :
+
+- **Un serveur supplémentaire** pour renforcer la capacité.
+- **Deux load balancers** configurés en cluster (HAProxy en mode haute disponibilité).
+- **Composants séparés** sur des serveurs dédiés :
+  - Un ou plusieurs serveurs web (Nginx).
+  - Un ou plusieurs serveurs applicatifs.
+  - Des serveurs dédiés à la base de données.
+
+---
+
+## 🌍 Fonctionnement (flux utilisateur)
+
+1. Le client tape `https://www.foobar.com`.
+2. Le DNS résout le domaine vers **l’adresse IP du cluster de load balancers**.
+3. Les **deux load balancers** assurent la répartition du trafic (active-active ou active-passive).
+4. Les serveurs sont désormais spécialisés :
+   - **Serveurs web (Nginx)** gèrent uniquement les requêtes HTTP.
+   - **Serveurs applicatifs** exécutent le code.
+   - **Serveurs MySQL** gèrent la base de données (un primaire, plusieurs répliques).
+5. La scalabilité est améliorée : on peut ajouter des serveurs à chaque couche sans tout redéployer.
+
+---
+
+## 🔧 Explication des ajouts
+
+- **Deux load balancers en cluster** : évitent qu’un seul LB devienne un SPOF.
+- **Séparation des rôles** : plus efficace que d’avoir web/app/DB mélangés sur les mêmes serveurs.
+- **Nouveau serveur ajouté** : permet d’absorber davantage de trafic.
+
+---
+
+## ⚠️ Problèmes et limites
+
+- La complexité augmente (configuration, synchronisation, monitoring).
+- La base MySQL reste limitée par le fait qu’un seul serveur accepte les écritures.
+- Les coûts sont plus élevés (plus de serveurs + cluster de load balancers).
+
+---
+
+## 📸 Diagramme (Scale up)
+
+```mermaid
+flowchart TD
+    U["Client"] --> DNS[(DNS)]
+    DNS --> LB1["Load Balancer 1 - HAProxy"]
+    DNS --> LB2["Load Balancer 2 - HAProxy"]
+
+    LB1 --> WEB1
+    LB1 --> WEB2
+    LB2 --> WEB1
+    LB2 --> WEB2
+
+    subgraph WEB1 ["Web Server 1"]
+        N1["Nginx"]
+    end
+
+    subgraph WEB2 ["Web Server 2"]
+        N2["Nginx"]
+    end
+
+    %% Web servers -> App servers
+    WEB1 --> APP1
+    WEB2 --> APP2
+
+    subgraph APP1 ["App Server 1"]
+        A1["Application Logic"]
+    end
+
+    subgraph APP2 ["App Server 2"]
+        A2["Application Logic"]
+    end
+
+    %% App servers -> DB
+    APP1 --> DB1
+    APP2 --> DB2
+
+    subgraph DB1 ["MySQL Primary"]
+    end
+
+    subgraph DB2 ["MySQL Replica"]
+    end
+
+    %% DB replication
+    DB1 --> DB2
+```
