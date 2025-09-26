@@ -48,4 +48,19 @@ It includes:
 
 ## 📸 Diagram (Simple Web Stack)
 
-![One server web infrastructure](diagramme_task0.png)
+```mermaid
+    flowchart TD
+    U[Client] --> DNS[(DNS)]
+    DNS --> S["Server (IP 8.8.8.8)"]
+
+    subgraph S ["Server (8.8.8.8)"]
+        N["Web Server - Nginx"]
+        A["Application Server"]
+        C["Application Files (Code base)"]
+        D["MySQL Database"]
+        N --> A --> C
+        A --> D
+    end
+
+    S --> U
+```
