@@ -58,33 +58,32 @@ L’infrastructure comprend :
 ## 📸 Diagramme (Infrastructure distribuée)
 
 ```mermaid
+  flowchart TD
+    U[Client] --> DNS[(DNS)]
+    DNS --> LB["Load Balancer - HAProxy"]
 
-flowchart TD
-    User[Client] --> DNS[(DNS)]
-    DNS --> LB[Load Balancer (HAProxy)]
-
-    LB --> S1[Server 1]
-    LB --> S2[Server 2]
+    LB --> S1
+    LB --> S2
 
     subgraph S1 [Server 1]
-        Nginx1[Web Server (Nginx)]
-        App1[Application Server]
-        Code1[App Files]
-        DB1[(MySQL Database)]
-        Nginx1 --> App1 --> Code1
-        App1 --> DB1
+        N1["Nginx"]
+        A1[App Server]
+        C1[App Files]
+        D1[(MySQL DB - Primary)]
+        N1 --> A1 --> C1
+        A1 --> D1
     end
 
     subgraph S2 [Server 2]
-        Nginx2[Web Server (Nginx)]
-        App2[Application Server]
-        Code2[App Files]
-        DB2[(MySQL Database)]
-        Nginx2 --> App2 --> Code2
-        App2 --> DB2
+        N2["Nginx"]
+        A2[App Server]
+        C2[App Files]
+        D2[(MySQL DB - Replica)]
+        N2 --> A2 --> C2
+        A2 --> D2
     end
 
-    S1 --> LB --> User
-    S2 --> LB
+    %% Synchronisation DB
+    D1 --> D2
 
 ```
