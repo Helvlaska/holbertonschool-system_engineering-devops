@@ -60,10 +60,10 @@ L’infrastructure comprend :
 ```mermaid
 flowchart TD
     User[Client] --> DNS[(DNS)]
-    DNS -->|Resolve www.foobar.com| LB[Load Balancer (HAProxy)]
+    DNS --> LB[Load Balancer (HAProxy)]
 
-    LB -->|Distributes traffic| S1[Server 1]
-    LB -->|Distributes traffic| S2[Server 2]
+    LB --> S1[Server 1]
+    LB --> S2[Server 2]
 
     subgraph S1 [Server 1]
         Nginx1[Web Server (Nginx)]
@@ -85,4 +85,4 @@ flowchart TD
 
     S1 --> LB --> User
     S2 --> LB
-```
+
