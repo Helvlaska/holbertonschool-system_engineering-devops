@@ -58,6 +58,7 @@ L’infrastructure comprend :
 ## 📸 Diagramme (Infrastructure distribuée)
 
 ```mermaid
+
 flowchart TD
     User[Client] --> DNS[(DNS)]
     DNS --> LB[Load Balancer (HAProxy)]
@@ -85,4 +86,5 @@ flowchart TD
 
     S1 --> LB --> User
     S2 --> LB
+
 ```
